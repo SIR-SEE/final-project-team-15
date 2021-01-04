@@ -21,8 +21,9 @@ def deriv(y, t, N, beta, gamma, delta, alpha, mu, kappa):
     # variable activating vaccination until whole population vaccinated
     
     dSdt = -beta(t) * I * S / N + mu * R - S * kappa * k
-    dVdt = (N-D) * kappa * k
-        
+    dVdt = (N-D) * kappa * k 
+    # random vaccination gives proportional distribution between S, E, I and R, leaving out D.
+    
     dEdt = beta(t) * I * S / N - delta * E - E * kappa * k
     dIdt = delta * E - (1 - alpha) * gamma * I - alpha * I - I * kappa * k
     dRdt = (1 - alpha) * gamma * I - mu * R - R * kappa * k
