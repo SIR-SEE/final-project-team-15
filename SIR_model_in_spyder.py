@@ -17,14 +17,15 @@ def deriv(y, t, N, beta, gamma, delta, alpha, mu, kappa):
     S, E, I, R, D, V = y
     vacc = 200 # introduction day for vaccine
     
-    k = 1 if vacc < t < 1/kappa else 0 # variable activating vaccination until whole population vaccinated
+    k = 1 if vacc < t < vacc + 1/kappa else 0 
+    # variable activating vaccination until whole population vaccinated
     
-    dSdt = -beta(t) * I * S / N + mu * R - N * kappa * k
-    dVdt = N * kappa * k
+    dSdt = -beta(t) * I * S / N + mu * R - S * kappa * k
+    dVdt = (N-D) * kappa * k
         
-    dEdt = beta(t) * I * S / N - delta * E
-    dIdt = delta * E - (1 - alpha) * gamma * I - alpha * I
-    dRdt = (1 - alpha) * gamma * I - mu * R
+    dEdt = beta(t) * I * S / N - delta * E - E * kappa * k
+    dIdt = delta * E - (1 - alpha) * gamma * I - alpha * I - I * kappa * k
+    dRdt = (1 - alpha) * gamma * I - mu * R - R * kappa * k
     dDdt = alpha * I
               
     return dSdt, dEdt, dIdt, dRdt, dDdt, dVdt
