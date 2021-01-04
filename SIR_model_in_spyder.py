@@ -19,18 +19,18 @@ def deriv(y, t, N, beta, gamma, delta, alpha, mu, kappa):
     
     vacc_pop = S + E + I + R # the people remaining to be vaccinated
     
-    k = 1 if vacc < t < vacc + (N-D)/kappa else 0 
+    k = 1 if vacc < t < vacc + (N-D)/vacc_doses else 0 
     # variable activating vaccination until whole population vaccinated
     
-    dSdt = -beta(t) * I * S / N + mu * R - S/vacc_pop * kappa * k + mu * V
-    dVdt = kappa * k - mu * V
+    dSdt = -beta(t) * I * S / N + mu * R - S/vacc_pop * vacc_doses * k + mu * V
+    dVdt = vacc_doses * k - mu * V
     # random vaccination gives proportional distribution between S, E, I and R, leaving out D.
     # we also have a fallback from vaccinated to susceptible because of a limited duration of immunity.
     # however this does not matter if the vaccination happens fast enough to exterminate the virus from the population. 
     
-    dEdt = beta(t) * I * S / N - delta * E - E/vacc_pop * kappa * k
-    dIdt = delta * E - (1 - alpha) * gamma * I - alpha * I - I/vacc_pop * kappa * k
-    dRdt = (1 - alpha) * gamma * I - mu * R - R/vacc_pop * kappa * k
+    dEdt = beta(t) * I * S / N - delta * E - E/vacc_pop * vacc_doses * k
+    dIdt = delta * E - (1 - alpha) * gamma * I - alpha * I - I/vacc_pop * vacc_doses * k
+    dRdt = (1 - alpha) * gamma * I - mu * R - R/vacc_pop * vacc_doses * k
     dDdt = alpha * I
               
     return dSdt, dEdt, dIdt, dRdt, dDdt, dVdt
@@ -50,7 +50,7 @@ alpha = 1/60                 # death percentage
 gamma = 1/Days_infection     # recovering rate
 mu = 1/1000                  # 1/duration of immunity
 L = 60                       # day of lockdown
-kappa = 12000                # vaccination doses per day
+vacc_doses = 12000                # vaccination doses per day
 
               
 S0, E0, I0, R0, D0, V0 = (N-1), 1, 0, 0, 0, 0 # initial conditions: one exposed, rest susceptible
@@ -61,7 +61,7 @@ t = np.linspace(0, 365, 700) # Grid of time points (in days)
 y0 = S0, E0, I0, R0, D0, V0 # Initial conditions vector
 
 # Integrate the SIR equations over the time grid, t.
-ret = odeint(deriv, y0, t, args=(N, beta, gamma, delta, alpha, mu, kappa))
+ret = odeint(deriv, y0, t, args=(N, beta, gamma, delta, alpha, mu, vacc_doses))
 S, E, I, R, D, V = ret.T
 
 
