@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed Dec 16 15:47:37 2020
+Created on Sun Jan  3 15:36:31 2021
 
-@author: Tage
+@author: edvindannas
 """
 
 from scipy.integrate import odeint
@@ -14,45 +15,39 @@ import matplotlib.pyplot as plt
 # describe the model
 def deriv(y, t, N, beta, gamma, delta, alpha, mu, kappa):
     S, E, I, R, D, V = y
-    vacc = 200 #introduction day for vaccine
+    vacc = 200 # introduction day for vaccine
     
-    if t < vacc:
-        dSdt = -beta(t) * S * I / N +mu*R
-        dVdt = 0
+    k = 1 if vacc < t < 1/kappa else 0 # variable activating vaccination until whole population vaccinated
+    
+    dSdt = -beta(t) * I * S / N + mu * R - N * kappa * k
+    dVdt = N * kappa * k
         
-        dEdt = beta(t) * S * I / N - gamma * E #- mu*E
-        dIdt = delta * E - gamma * I  - alpha * I  #- mu*I
-        dRdt = gamma * I - mu* R
-        dDdt = alpha * I
-    elif t >= vacc:
-        dSdt = -beta(t) * S * I / N +mu*R - S*kappa
-        dVdt = S * kappa
-        
-        dEdt = beta(t) * S * I / N - gamma * E #- mu*E
-        dIdt = delta * E - gamma * I  - alpha * I  #- mu*I
-        dRdt = gamma * I - mu* R
-        dDdt = alpha * I
-        
+    dEdt = beta(t) * I * S / N - delta * E
+    dIdt = delta * E - (1 - alpha) * gamma * I - alpha * I
+    dRdt = (1 - alpha) * gamma * I - mu * R
+    dDdt = alpha * I
+              
     return dSdt, dEdt, dIdt, dRdt, dDdt, dVdt
 
 def R_0(t):
-    return 12 if t < L else 2 #the value of R0 dependent on if a lockdown is introduced
+    return 12 if t < L else 2 # the value of R0 dependent on if a lockdown is introduced
 
-def beta(t):
-    return R_0(t) * gamma #beta dependent on R0 and our behaviour
+def beta(t): # rate of spread (number of exposed per individual and day)
+    return R_0(t) * gamma # beta dependent on R0 and our behaviour??? (1-b)???
 
 # describe the parameters
-L = 60 #day of lockdown
-N =  7000000           # population
-Days = 8
-delta = 1.0/Days
-alpha = 1/60 #death percentage
-gamma=1/Days #recovering per day
-mu = 1/1000 #vaining immunity
-kappa = 1/200 #vaccination percentage per day of population
+N =  7000000                 # population
+Days_infection = 8           # duration of infection
+Days_incubation = 8          # incubation time
+delta = 1.0/Days_incubation  # incubation rate
+alpha = 1/60                 # death percentage
+gamma = 1/Days_infection     # recovering rate
+mu = 1/1000                  # 1/duration of immunity
+L = 60                       # day of lockdown
+kappa = 1/200                # vaccination percentage per day of population
 
               
-S0, E0, I0, R0, D0, V0 = (N-1), 1, 0, 0, 0, 0 # initial conditions: one infected, rest susceptible
+S0, E0, I0, R0, D0, V0 = (N-1), 1, 0, 0, 0, 0 # initial conditions: one exposed, rest susceptible
 
 
 
