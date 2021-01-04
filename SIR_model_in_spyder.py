@@ -29,11 +29,11 @@ def deriv(y, t, N, beta, gamma, delta, alpha, mu, kappa):
               
     return dSdt, dEdt, dIdt, dRdt, dDdt, dVdt
 
-def R_0(t):
-    return 12 if t < L else 2 # the value of R0 dependent on if a lockdown is introduced
+def R_0(t): # behavioral dependent
+    return 12 if t < L else 2 # the value of R0 changes if a lockdown is introduced
 
 def beta(t): # rate of spread (number of exposed per individual and day)
-    return R_0(t) * gamma # beta dependent on R0 and our behaviour??? (1-b)???
+    return R_0(t) * gamma
 
 # describe the parameters
 N =  7000000                 # population
