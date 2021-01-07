@@ -50,7 +50,7 @@ alpha = 1/60                 # death percentage
 gamma = 1/Days_infection     # recovering rate
 mu = 1/1000                  # 1/duration of immunity
 L = 60                       # day of lockdown
-vacc_doses = 12000                # vaccination doses per day
+vacc_doses = 12000           # vaccination doses per day
 
               
 S0, E0, I0, R0, D0, V0 = (N-1), 1, 0, 0, 0, 0 # initial conditions: one exposed, rest susceptible
